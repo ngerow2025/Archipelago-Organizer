@@ -1,10 +1,12 @@
 #include "mainwindow.h"
 #include "frontend/games/gametabwidget.h"
+#include "datastore/database.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     createUI();
+    new Database(this);
 }
 
 MainWindow::~MainWindow()
