@@ -5,8 +5,7 @@ This project is a Qt-based organizer/launcher for the Archipelago modded games, 
 ## Workspace Layout
 
 | Folder | Purpose |
-| --- | --- | --- |
-
+| --- | --- |
 | `Game/` | Local game install, force the use of windows compatibility tools in Steam then copy the contents of A Dance of Fire and Ice from there into this folder, `A Dance of Fire and Ice.exe` must end up in this folder. |
 | `mod/ADOFAI_AP-Mod/` | ADOFAI Archipelago mod, download from https://github.com/ClaudeChibout/ADOFAI_AP-Mod/releases, `winhttp.dll` must be in this folder. |
 | `BepInEx_win_x64_5.4.23.5` | BepInEx mod loader, download from https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5, extract the contents of the zip into this folder. |
