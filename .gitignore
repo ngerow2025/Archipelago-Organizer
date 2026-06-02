@@ -96,3 +96,12 @@ CMakeLists.txt.user*
 # Local runtime artifacts
 depots/
 /archipelago_organiser.db
+
+# Keep directory skeletons for large local assets
+/manual/fake-library/**
+!/manual/fake-library/**/
+!/manual/fake-library/**/.gitkeep
+
+/manual/proton-10.0/**
+!/manual/proton-10.0/**/
+!/manual/proton-10.0/**/.gitkeep
