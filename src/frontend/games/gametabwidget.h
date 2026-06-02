@@ -8,21 +8,20 @@ class SteamLibrariesWidget;
 class RegisteredGamesWidget;
 class YAMLConfigsWidget;
 
-class GameTabWidget : public QWidget
-{
+class GameTabWidget : public QWidget {
     Q_OBJECT
 
-public:
-    explicit GameTabWidget(QWidget *parent = nullptr);
+   public:
+    explicit GameTabWidget(QWidget* parent = nullptr);
     ~GameTabWidget() override;
 
-private:
+   private:
     void createUI();
 
-    QTabWidget *tabWidget;
-    SteamLibrariesWidget *steamLibrariesWidget;
-    RegisteredGamesWidget *registeredGamesWidget;
-    YAMLConfigsWidget *yamlConfigsWidget;
+    QTabWidget*            tabWidget;
+    SteamLibrariesWidget*  steamLibrariesWidget;
+    RegisteredGamesWidget* registeredGamesWidget;
+    YAMLConfigsWidget*     yamlConfigsWidget;
 };
 
-#endif // GAMETABWIDGET_H
+#endif  // GAMETABWIDGET_H

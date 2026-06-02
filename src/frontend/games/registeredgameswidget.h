@@ -6,51 +6,41 @@
 class QPushButton;
 class QListWidget;
 
-enum GameStatus
-{
-    Registered,
-    ModCached,
-    Validated
-};
+enum GameStatus { Registered, ModCached, Validated };
 
-struct GameInfo
-{
-    int id;
-    QString name;
+struct GameInfo {
+    int        id;
+    QString    name;
     GameStatus status;
 };
 
-enum GameRole
-{
-    GameIdRole = Qt::UserRole + 1
-};
+enum GameRole { GameIdRole = Qt::UserRole + 1 };
 
-class RegisteredGamesWidget : public QWidget
-{
+class RegisteredGamesWidget : public QWidget {
     Q_OBJECT
 
-public:
-    explicit RegisteredGamesWidget(QWidget *parent = nullptr);
+   public:
+    explicit RegisteredGamesWidget(QWidget* parent = nullptr);
     ~RegisteredGamesWidget() override;
 
-public slots:
-    void addGame(const GameInfo &gameInfo);
+   public slots:
+    void addGame(const GameInfo& gameInfo);
     void removeGame(int gameId);
     void updateGameStatus(int gameId, GameStatus status);
     void clearGames();
 
-signals:
+   signals:
     void addGameClicked();
     void reloadGameRequested(int gameId);
     void deleteGameRequested(int gameId);
     void downloadModRequested(int gameId);
 
-private:
+   private:
     void createUI();
-    void updateGameItem(int gameId, const GameInfo &gameInfo);
+    void updateGameItem(int gameId, const GameInfo& gameInfo);
 
-    QPushButton *addGameButton;
-    QListWidget *gamesList;
+    QPushButton* addGameButton;
+    QListWidget* gamesList;
 };
 
-#endif // REGISTEREDGAMESWIDGET_H
+#endif  // REGISTEREDGAMESWIDGET_H

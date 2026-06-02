@@ -6,18 +6,17 @@
 
 class GameTabWidget;
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
+   public:
+    explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
     void createUI();
 
-private:
-    QTabWidget *tabWidget;
-    GameTabWidget *gamesTab;
+   private:
+    QTabWidget*    tabWidget;
+    GameTabWidget* gamesTab;
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

@@ -1,9 +1,9 @@
 #include "gameListWidget.h"
-#include <QVBoxLayout>
-#include <QLabel>
 
-GameListWidget::GameListWidget(QWidget *parent)
-    : QWidget(parent) {
+#include <QLabel>
+#include <QVBoxLayout>
+
+GameListWidget::GameListWidget(QWidget* parent) : QWidget(parent) {
     setObjectName("gameListWidget");
     m_layout = new QVBoxLayout(this);
     m_layout->setObjectName("gameListLayout");

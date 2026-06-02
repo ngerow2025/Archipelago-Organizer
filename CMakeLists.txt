@@ -26,6 +26,16 @@ set(PROJECT_SOURCES
         src/frontend/games/registeredgameswidget.h
         src/frontend/games/yamlconfigswidget.cpp
         src/frontend/games/yamlconfigswidget.h
+        src/logic/sandbox.cpp
+        src/logic/sandbox.h
+        src/logic/proton.cpp
+        src/logic/proton.h
+        src/logic/util.cpp
+        src/logic/util.h
+        src/logic/mounts.cpp
+        src/logic/mounts.h
+        src/games/ADOFAI/config.cpp
+        src/games/ADOFAI/config.h
         src/datastore/database.cpp
         src/datastore/database.h
 )

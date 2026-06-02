@@ -94,4 +94,5 @@ CMakeLists.txt.user*
 /.qtcreator/
 
 # Local runtime artifacts
+depots/
 /archipelago_organiser.db

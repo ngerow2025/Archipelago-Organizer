@@ -1,23 +1,20 @@
 #include "mainwindow.h"
-#include "frontend/games/gametabwidget.h"
-#include "datastore/database.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
+#include "datastore/database.h"
+#include "frontend/games/gametabwidget.h"
+
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     createUI();
     new Database(this);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
 }
 
-void MainWindow::createUI()
-{
+void MainWindow::createUI() {
     tabWidget = new QTabWidget(this);
     tabWidget->setObjectName("tabWidget");
-    
+
     gamesTab = new GameTabWidget(this);
     gamesTab->setObjectName("gamesTab");
     tabWidget->addTab(gamesTab, "Games");

@@ -1,12 +1,10 @@
 #include "database.h"
 
+#include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QDebug>
 
-Database::Database(QObject *parent)
-    : QObject(parent)
-{
+Database::Database(QObject* parent) : QObject(parent) {
     databaseConnection = QSqlDatabase::addDatabase("QSQLITE");
     databaseConnection.setDatabaseName("archipelago_organiser.db");
     if (!databaseConnection.open()) {
@@ -16,17 +14,14 @@ Database::Database(QObject *parent)
     }
 
     setupDatabase();
-
 }
 
-Database::~Database()
-{
+Database::~Database() {
 }
-
 
 void Database::setupDatabase() {
     createSteamLibraryTable();
-    checkDatabaseError();    
+    checkDatabaseError();
     createGameTable();
     checkDatabaseError();
 }
@@ -40,7 +35,7 @@ void Database::checkDatabaseError() {
 
 void Database::createSteamLibraryTable() {
     QSqlQuery query(databaseConnection);
-    QString createTableSQL = R"(
+    QString   createTableSQL = R"(
         CREATE TABLE IF NOT EXISTS steam_library (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             path TEXT NOT NULL
@@ -55,7 +50,7 @@ void Database::createSteamLibraryTable() {
 
 void Database::createGameTable() {
     QSqlQuery query(databaseConnection);
-    QString createTableSQL = R"(
+    QString   createTableSQL = R"(
         CREATE TABLE IF NOT EXISTS game (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -73,7 +68,7 @@ void Database::createGameTable() {
 // CRUD METHODS FOR STEAM LIBRARY
 // ============================================================================
 
-int Database::addSteamLibrary(const QString &path) {
+int Database::addSteamLibrary(const QString& path) {
     if (path.isEmpty()) {
         qWarning() << "Cannot add SteamLibrary with empty path";
         return -1;
@@ -118,7 +113,7 @@ SteamLibrary Database::getSteamLibraryById(int id) {
 
 QList<SteamLibrary> Database::getAllSteamLibraries() {
     QList<SteamLibrary> libraries;
-    QSqlQuery query(databaseConnection);
+    QSqlQuery           query(databaseConnection);
 
     if (!query.exec("SELECT id, path FROM steam_library")) {
         qWarning() << "Failed to retrieve all SteamLibraries:" << query.lastError().text();
@@ -133,7 +128,7 @@ QList<SteamLibrary> Database::getAllSteamLibraries() {
     return libraries;
 }
 
-bool Database::updateSteamLibrary(int id, const QString &path) {
+bool Database::updateSteamLibrary(int id, const QString& path) {
     if (id <= 0 || path.isEmpty()) {
         qWarning() << "Invalid parameters for updateSteamLibrary";
         return false;
@@ -186,7 +181,7 @@ bool Database::deleteSteamLibrary(int id) {
 // CRUD METHODS FOR GAME
 // ============================================================================
 
-int Database::addGame(const QString &name, const QString &path) {
+int Database::addGame(const QString& name, const QString& path) {
     if (name.isEmpty() || path.isEmpty()) {
         qWarning() << "Cannot add Game with empty name or path";
         return -1;
@@ -232,7 +227,7 @@ Game Database::getGameById(int id) {
 
 QList<Game> Database::getAllGames() {
     QList<Game> games;
-    QSqlQuery query(databaseConnection);
+    QSqlQuery   query(databaseConnection);
 
     if (!query.exec("SELECT id, name, path FROM game")) {
         qWarning() << "Failed to retrieve all Games:" << query.lastError().text();
@@ -240,14 +235,15 @@ QList<Game> Database::getAllGames() {
     }
 
     while (query.next()) {
-        games.append(Game(query.value(0).toInt(), query.value(1).toString(), query.value(2).toString()));
+        games.append(
+            Game(query.value(0).toInt(), query.value(1).toString(), query.value(2).toString()));
     }
 
     qDebug() << "Retrieved" << games.size() << "Games";
     return games;
 }
 
-bool Database::updateGame(int id, const QString &name, const QString &path) {
+bool Database::updateGame(int id, const QString& name, const QString& path) {
     if (id <= 0 || name.isEmpty() || path.isEmpty()) {
         qWarning() << "Invalid parameters for updateGame";
         return false;
