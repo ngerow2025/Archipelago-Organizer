@@ -38,7 +38,12 @@ set(PROJECT_SOURCES
         src/games/ADOFAI/config.h
         src/datastore/database.cpp
         src/datastore/database.h
+        src/datastore/protonDiskGame.cpp
+        src/datastore/protonDiskGame.h
+        src/datastore/steamGame.cpp
+        src/datastore/steamGame.h
 )
+
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Archipelago-Organiser

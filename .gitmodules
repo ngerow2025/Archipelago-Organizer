@@ -1,6 +1,6 @@
 [submodule "SteamKit"]
 	path = SteamKit
-	url = https://github.com/SteamRE/SteamKit
+	url = https://github.com/ngerow2025/SteamKit
 [submodule "DNNE"]
 	path = DNNE
 	url = https://github.com/ngerow2025/DNNE

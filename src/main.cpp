@@ -1,18 +1,70 @@
 #include "main.h"
 
-#include <QLoggingCategory>
 #include <QDir>
+#include <QLoggingCategory>
 
+#include "../SteamKit/SteamKit2/SteamKit2/bin/Release/net8.0/linux-x64/SteamKit2.h"
+#include "logic/mounts.h"
+#include "logic/proton.h"
 #include "logic/sandbox.h"
+#include "logic/util.h"
 #include "mainwindow.h"
 #include "sys/mount.h"
 #include "sys/wait.h"
-#include "logic/util.h"
-#include "logic/proton.h"
-#include "logic/mounts.h"
 
+static intptr_t steamClient;
+static intptr_t steamUser;
+
+void OnConnectedCallback(intptr_t callback) {
+    qDebug() << "Connected to Steam!";
+    intptr_t authSession = SteamClient_Authentication_BeginAuthSessionViaQRAsync(steamClient);
+
+    AuthSession_SetChallengeURLChangedCallback(authSession, reinterpret_cast<intptr_t>(+[](void) {
+        qDebug() << "Challenge URL changed!";
+    }));
+
+    AuthPollResultNative authPollResult = AuthSession_PollingWaitForResultAsync(authSession);
+
+    qDebug() << "Logging in as " << authPollResult.account_name;
+
+    SteamUser_LogOn(steamUser, CreateLogOnDetails(
+        authPollResult.account_name,
+        authPollResult.refresh_token
+    ));
+}
+
+void OnDisconnectedCallback(intptr_t callback) {
+    qDebug() << "Disconnected from Steam!";
+}
+
+void OnLoggedOnCallback(intptr_t callback) {
+    qDebug() << "Logged on to Steam!";
+    qDebug() << "Result: " << LoggedOnCallbackData_GetResult(callback);
+}
+
+void OnLoggedOffCallback(intptr_t callback) {
+    qDebug() << "Logged off from Steam!";
+}
 
 int main(int argc, char* argv[]) {
+    steamClient = CreateSteamClient();
+    intptr_t callbackManager = CreateCallbackManager(steamClient);
+    CallbackManagerSubscribeConnectedCallback(callbackManager, reinterpret_cast<intptr_t>(OnConnectedCallback));
+    CallbackManagerSubscribeDisconnectedCallback(callbackManager, reinterpret_cast<intptr_t>(OnDisconnectedCallback));
+    CallbackManagerSubscribeLoggedOnCallback(callbackManager, reinterpret_cast<intptr_t>(OnLoggedOnCallback));
+    CallbackManagerSubscribeLoggedOffCallback(callbackManager, reinterpret_cast<intptr_t>(OnLoggedOffCallback));
+    steamUser = GetSteamUserHandler(steamClient);
+
+    SteamClientConnect(steamClient);
+
+    while(true){
+        qDebug() << "Running callbacks...";
+        CallbackManagerRunCallbacks(callbackManager);
+        sleep(1);
+    }
+
+    return 0;
+
     {
         int retVal;
         if ((retVal = activateUserNamespaceSandbox()) != 0) {
@@ -52,7 +104,6 @@ int main(int argc, char* argv[]) {
     QString setupDriveDir = "./setup_a_drive/";
     QString workDir = "./work/";
     QString configPath = QDir(upperDir).filePath("BepInEx/config/com.shotal.ADOFAI_AP.cfg");
-
 
     QString compatBaseDir = "./compat_base/";
     QString compatOverlayDir = "./compat_base_overlay/";
@@ -113,13 +164,12 @@ int main(int argc, char* argv[]) {
             .gameExePath = QDir::cleanPath(QDir::current().absoluteFilePath("hello_world.exe")),
             .protonToolPath =
                 QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps/common/Proton 10.0")),
-            .sniperPath = QDir::cleanPath(QDir::home().filePath(
-                ".steam/steam/steamapps/common/SteamLinuxRuntime_sniper")),
+            .sniperPath = QDir::cleanPath(
+                QDir::home().filePath(".steam/steam/steamapps/common/SteamLinuxRuntime_sniper")),
             .gameInstallPath = QDir::cleanPath(QDir::current().absoluteFilePath(gameDir)),
-            .steamAppsPath =
-                QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps")),
-            .shaderCachePath = QDir::cleanPath(
-                QDir::home().filePath(".steam/steam/steamapps/shadercache/977950")),
+            .steamAppsPath = QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps")),
+            .shaderCachePath =
+                QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps/shadercache/977950")),
         };
 
         const QString setupExecutableSource =
@@ -276,13 +326,12 @@ int main(int argc, char* argv[]) {
             .gameExePath = QDir::cleanPath(QDir(mergeDir).filePath("A Dance of Fire and Ice.exe")),
             .protonToolPath =
                 QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps/common/Proton 10.0")),
-            .sniperPath = QDir::cleanPath(QDir::home().filePath(
-                ".steam/steam/steamapps/common/SteamLinuxRuntime_sniper")),
+            .sniperPath = QDir::cleanPath(
+                QDir::home().filePath(".steam/steam/steamapps/common/SteamLinuxRuntime_sniper")),
             .gameInstallPath = QDir::cleanPath(QDir::current().absoluteFilePath(gameDir)),
-            .steamAppsPath =
-                QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps")),
-            .shaderCachePath = QDir::cleanPath(
-                QDir::home().filePath(".steam/steam/steamapps/shadercache/977950")),
+            .steamAppsPath = QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps")),
+            .shaderCachePath =
+                QDir::cleanPath(QDir::home().filePath(".steam/steam/steamapps/shadercache/977950")),
         };
 
         printFileState("[main][game-sandbox] Game executable", protonPaths.gameExePath);
