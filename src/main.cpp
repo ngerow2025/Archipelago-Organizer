@@ -3,7 +3,6 @@
 #include <QDir>
 #include <QLoggingCategory>
 
-#include "../SteamKit/SteamKit2/SteamKit2/bin/Release/net8.0/linux-x64/SteamKit2.h"
 #include "logic/mounts.h"
 #include "logic/proton.h"
 #include "logic/sandbox.h"
@@ -12,56 +11,18 @@
 #include "sys/mount.h"
 #include "sys/wait.h"
 
-static intptr_t steamClient;
-static intptr_t steamUser;
-
-void OnConnectedCallback(intptr_t callback) {
-    qDebug() << "Connected to Steam!";
-    intptr_t authSession = SteamClient_Authentication_BeginAuthSessionViaQRAsync(steamClient);
-
-    AuthSession_SetChallengeURLChangedCallback(authSession, reinterpret_cast<intptr_t>(+[](void) {
-        qDebug() << "Challenge URL changed!";
-    }));
-
-    AuthPollResultNative authPollResult = AuthSession_PollingWaitForResultAsync(authSession);
-
-    qDebug() << "Logging in as " << authPollResult.account_name;
-
-    SteamUser_LogOn(steamUser, CreateLogOnDetails(
-        authPollResult.account_name,
-        authPollResult.refresh_token
-    ));
-}
-
-void OnDisconnectedCallback(intptr_t callback) {
-    qDebug() << "Disconnected from Steam!";
-}
-
-void OnLoggedOnCallback(intptr_t callback) {
-    qDebug() << "Logged on to Steam!";
-    qDebug() << "Result: " << LoggedOnCallbackData_GetResult(callback);
-}
-
-void OnLoggedOffCallback(intptr_t callback) {
-    qDebug() << "Logged off from Steam!";
-}
+#include "steam-protoc-gen/steammessages_auth.steamclient.pb.h"
+#include ""
 
 int main(int argc, char* argv[]) {
-    steamClient = CreateSteamClient();
-    intptr_t callbackManager = CreateCallbackManager(steamClient);
-    CallbackManagerSubscribeConnectedCallback(callbackManager, reinterpret_cast<intptr_t>(OnConnectedCallback));
-    CallbackManagerSubscribeDisconnectedCallback(callbackManager, reinterpret_cast<intptr_t>(OnDisconnectedCallback));
-    CallbackManagerSubscribeLoggedOnCallback(callbackManager, reinterpret_cast<intptr_t>(OnLoggedOnCallback));
-    CallbackManagerSubscribeLoggedOffCallback(callbackManager, reinterpret_cast<intptr_t>(OnLoggedOffCallback));
-    steamUser = GetSteamUserHandler(steamClient);
 
-    SteamClientConnect(steamClient);
+    auto auth_request = CAuthentication_BeginAuthSessionViaQR_Request {};
+    auth_request.set_website_id("Client");
+    auto auth_request_details = CAuthentication_DeviceDetails {};
+    auth_request_details.set_device_friendly_name("Archipelago Organiser Client");
+    auth_request_details.set_platform_type(k_EAuthTokenPlatformType_SteamClient);
+    auth_request_details.set_os_type()
 
-    while(true){
-        qDebug() << "Running callbacks...";
-        CallbackManagerRunCallbacks(callbackManager);
-        sleep(1);
-    }
 
     return 0;
 

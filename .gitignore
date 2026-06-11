@@ -105,3 +105,5 @@ depots/
 /manual/proton-10.0/**
 !/manual/proton-10.0/**/
 !/manual/proton-10.0/**/.gitkeep
+
+/src/steam-protoc-gen/
