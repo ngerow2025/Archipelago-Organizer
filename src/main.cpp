@@ -2,6 +2,9 @@
 
 #include <QDir>
 #include <QLoggingCategory>
+#include <QScreen>
+#include <QStandardPaths>
+#include <QApplication>
 
 #include "logic/mounts.h"
 #include "logic/proton.h"
@@ -11,17 +14,32 @@
 #include "sys/mount.h"
 #include "sys/wait.h"
 
-#include "steam-protoc-gen/steammessages_auth.steamclient.pb.h"
-#include ""
+#include "protobuf/steammessages_auth.steamclient.pb.h"
+#include "enums/enums.h"
+#include "enums/emsg.h"
+
+
 
 int main(int argc, char* argv[]) {
+    
+    QApplication a(argc, argv);
+    MainWindow w;
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
+    int targetWidth = screenGeometry.width() * 0.8;
+    int targetHeight = screenGeometry.height() * 0.8;
+    w.resize(targetWidth, targetHeight);
+    w.show();
+    return QApplication::exec();
+
+
 
     auto auth_request = CAuthentication_BeginAuthSessionViaQR_Request {};
     auth_request.set_website_id("Client");
-    auto auth_request_details = CAuthentication_DeviceDetails {};
-    auth_request_details.set_device_friendly_name("Archipelago Organiser Client");
-    auth_request_details.set_platform_type(k_EAuthTokenPlatformType_SteamClient);
-    auth_request_details.set_os_type()
+    auth_request.mutable_device_details()->set_device_friendly_name("Archipelago Organiser Client");
+    auth_request.mutable_device_details()->set_platform_type(k_EAuthTokenPlatformType_SteamClient);
+    auth_request.mutable_device_details()->set_os_type((uint32_t)SteamKit::EOSType::Linux7x);
+
+    auto eMsg = SteamKit::EMsg::ServiceMethodCallFromClientNonAuthed;
 
 
     return 0;
@@ -33,14 +51,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // QApplication a(argc, argv);
-    // MainWindow w;
-    // QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    // int targetWidth = screenGeometry.width() * 0.8;
-    // int targetHeight = screenGeometry.height() * 0.8;
-    // w.resize(targetWidth, targetHeight);
-    // w.show();
-    // return QApplication::exec();
 
     QLoggingCategory::setFilterRules("filecopy.info=true");
 

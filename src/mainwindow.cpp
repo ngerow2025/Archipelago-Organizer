@@ -2,10 +2,33 @@
 
 #include "datastore/database.h"
 #include "frontend/games/gametabwidget.h"
+#include "steam/connectionmanager.h"
+#include "protobuf/steammessages_clientserver_login.pb.h"
+#include "enums/steammsg.h"
+#include "enums/emsg.h"
+#include "steam/authConnection.h"
+
+
+
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
-    createUI();
-    new Database(this);
+    // createUI();
+    // new Database(this);
+    auto nm = new ConnectionManager(this);
+    connect(nm, &ConnectionManager::refreshFinished, this, [this, nm](bool success) {
+        if (!success) {
+            qDebug() << "Failed to refresh connection manager list.";
+            return;
+        }
+        auto preferredEndpoint = nm->getPreferredEndpoint();
+        auto authConnection = new SteamAuthConnection(this);
+        connect(authConnection, &SteamAuthConnection::unauthConnected, this, [this, authConnection]() {
+            qDebug() << "Successfully connected to Steam Auth Service.";
+            authConnection->beginAuth();
+        });
+        authConnection->connectToEndpoint(preferredEndpoint);
+    });
+    nm->refreshConnectionManagerList();
 }
 
 MainWindow::~MainWindow() {

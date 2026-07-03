@@ -73,7 +73,7 @@ CMakeLists.txt.user*
 # --------
 *.dll
 *.exe
-
+!hellow_world.exe
 # Directories with generated files
 .moc/
 .obj/
@@ -81,16 +81,6 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
-/BepInEx_win_x64_5.4.23.5/
-/Game/
-/merge/
-/mod/
-/upper/
-/work/
-/compat_base/
-/compat_base_overlay/
-/compat_base_overlay_upper/
-/compat_base_overlay_work/
 /.qtcreator/
 
 # Local runtime artifacts
@@ -106,4 +96,5 @@ depots/
 !/manual/proton-10.0/**/
 !/manual/proton-10.0/**/.gitkeep
 
-/src/steam-protoc-gen/
+/src/gen
+.idea/

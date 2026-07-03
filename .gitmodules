@@ -1,3 +1,13 @@
+# Git submodules
 [submodule "Steam-Protobufs"]
-	path = Steam-Protobufs
+	path = 3rd_party/Steam-Protobufs
 	url = https://github.com/SteamTracking/Protobufs
+[submodule "SteamKit"]
+	path = 3rd_party/SteamKit
+	url = https://github.com/ngerow2025/SteamKit
+[submodule "ValveFileVDF"]
+	path = 3rd_party/ValveFileVDF
+	url = https://github.com/TinyTinni/ValveFileVDF
+[submodule "external/magic_enum"]
+	path = 3rd_party/magic_enum
+	url = https://github.com/Neargye/magic_enum.git
