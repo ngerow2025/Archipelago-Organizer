@@ -13,7 +13,13 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network WebSockets)
 find_package(Protobuf CONFIG REQUIRED)
 
-add_library(proto-objects OBJECT
+# --- Preprocess Protobuf Files to add namespace 'steam' ---
+set(PROTO_PACKAGE "steam.proto")
+set(PROTO_PROCESSED_DIR "${CMAKE_CURRENT_BINARY_DIR}/processed_protos")
+set(PROTO_IMPORT_DIRS "${PROTO_PROCESSED_DIR}/steam")
+
+# The list of original proto files to preprocess
+set(ORIGINAL_PROTO_SOURCES
     "3rd_party/Steam-Protobufs/steam/clientmetrics.proto"
     "3rd_party/Steam-Protobufs/steam/content_manifest.proto"
     "3rd_party/Steam-Protobufs/steam/contenthubs.proto"
@@ -127,19 +133,43 @@ add_library(proto-objects OBJECT
     "3rd_party/Steam-Protobufs/steam/webuimessages_user.proto"
 )
 
+# Map original files to the build folder target destination
+set(PROCESSED_PROTO_SOURCES)
+foreach(PROTO_FILE ${ORIGINAL_PROTO_SOURCES})
+    file(RELATIVE_PATH REL_PATH "${CMAKE_CURRENT_LIST_DIR}/3rd_party/Steam-Protobufs" "${CMAKE_CURRENT_LIST_DIR}/${PROTO_FILE}")
+    set(PROCESSED_FILE "${PROTO_PROCESSED_DIR}/${REL_PATH}")
+    list(APPEND PROCESSED_PROTO_SOURCES "${PROCESSED_FILE}")
+
+    # Set up custom command to preprocess each proto file
+    add_custom_command(
+        OUTPUT "${PROCESSED_FILE}"
+        COMMAND Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/preprocess_protos.py"
+                "${CMAKE_CURRENT_LIST_DIR}/${PROTO_FILE}"
+                "${PROCESSED_FILE}"
+                "${PROTO_PACKAGE}"
+        DEPENDS "${CMAKE_CURRENT_LIST_DIR}/${PROTO_FILE}"
+                "${CMAKE_CURRENT_LIST_DIR}/preprocess_protos.py"
+        COMMENT "Preprocessing proto: ${PROTO_FILE} -> ${PROCESSED_FILE}"
+        VERBATIM
+    )
+endforeach()
+
+# Add the library target using the generated preprocessed proto files
+add_library(proto-objects OBJECT ${PROCESSED_PROTO_SOURCES})
+
 set(PROTO_BINARY_DIR "${CMAKE_CURRENT_LIST_DIR}/src/gen/protobuf") 
-set(PROTO_IMPORT_DIRS "3rd_party/Steam-Protobufs/steam")
 
 target_include_directories(proto-objects PUBLIC "$<BUILD_INTERFACE:${PROTO_BINARY_DIR}>")
 target_link_libraries(proto-objects PUBLIC protobuf::libprotobuf)
 
+# Run protobuf generation on the preprocessed files
 protobuf_generate(
     TARGET proto-objects
     IMPORT_DIRS ${PROTO_IMPORT_DIRS}
     PROTOC_OUT_DIR "${PROTO_BINARY_DIR}")
 
 # --- SteamKit SteamLanguage (.steamd) Enum Generation ---
-set(STEAM_LANGUAGE_DIR "3rd_party/SteamKit/Resources/SteamLanguage")
+set(STEAM_LANGUAGE_DIR "${CMAKE_CURRENT_LIST_DIR}/3rd_party/SteamKit/Resources/SteamLanguage")
 set(STEAM_ENUMS_GEN_DIR "${CMAKE_CURRENT_LIST_DIR}/src/gen/enums")
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
@@ -159,7 +189,7 @@ add_custom_command(
     COMMAND Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/parse_steamd.py"
             -i "${STEAM_LANGUAGE_DIR}"
             -o "${STEAM_ENUMS_GEN_DIR}"
-            -n "3rd_party/SteamKit"
+            -n "steam::lang"
     DEPENDS "${CMAKE_CURRENT_LIST_DIR}/parse_steamd.py"
             "${STEAM_LANGUAGE_DIR}/emsg.steamd"
             "${STEAM_LANGUAGE_DIR}/enums.steamd"
@@ -176,45 +206,45 @@ add_custom_target(generate-steam-enums DEPENDS ${GENERATED_ENUM_HEADERS})
 
 
 set(PROJECT_SOURCES
-        src/main.cpp
-        src/mainwindow.cpp
-        src/mainwindow.h
-        src/frontend/games/gameListWidget.cpp
-        src/frontend/games/gameListWidget.h
-        src/frontend/games/gametabwidget.cpp
-        src/frontend/games/gametabwidget.h
-        src/frontend/games/steamlibrarieswidget.cpp
-        src/frontend/games/steamlibrarieswidget.h
-        src/frontend/games/registeredgameswidget.cpp
-        src/frontend/games/registeredgameswidget.h
-        src/frontend/games/yamlconfigswidget.cpp
-        src/frontend/games/yamlconfigswidget.h
-        src/logic/sandbox.cpp
-        src/logic/sandbox.h
-        src/logic/proton.cpp
-        src/logic/proton.h
-        src/logic/util.cpp
-        src/logic/util.h
-        src/logic/mounts.cpp
-        src/logic/mounts.h
-        src/games/ADOFAI/config.cpp
-        src/games/ADOFAI/config.h
-        src/datastore/database.cpp
-        src/datastore/database.h
-        src/datastore/protonDiskGame.cpp
-        src/datastore/protonDiskGame.h
-        src/datastore/steamGame.cpp
-        src/datastore/steamGame.h
-        src/steam/connectionmanager.cpp
-        src/steam/connectionmanager.h
-        src/steam/jobID.h
-        src/steam/jobID.cpp
-        src/steam/connection.cpp
-        src/steam/connection.h
-        src/steam/authConnection.cpp
-        src/steam/authConnection.h
-        src/steam/util.cpp
-        src/steam/util.h
+        src/Main.cpp
+        src/MainWindow.cpp
+        src/MainWindow.h
+        src/frontend/games/GameListWidget.cpp
+        src/frontend/games/GameListWidget.h
+        src/frontend/games/GameTabWidget.cpp
+        src/frontend/games/GameTabWidget.h
+        src/frontend/games/SteamLibrariesWidget.cpp
+        src/frontend/games/SteamLibrariesWidget.h
+        src/frontend/games/RegisteredGamesWidget.cpp
+        src/frontend/games/RegisteredGamesWidget.h
+        src/frontend/games/YAMLConfigsWidget.cpp
+        src/frontend/games/YAMLConfigsWidget.h
+        src/logic/Sandbox.cpp
+        src/logic/Sandbox.h
+        src/logic/Proton.cpp
+        src/logic/Proton.h
+        src/logic/Util.cpp
+        src/logic/Util.h
+        src/logic/Mounts.cpp
+        src/logic/Mounts.h
+        src/games/ADOFAI/Config.cpp
+        src/games/ADOFAI/Config.h
+        src/datastore/Database.cpp
+        src/datastore/Database.h
+        src/datastore/DiskGame.cpp
+        src/datastore/DiskGame.h
+        src/datastore/SteamGame.cpp
+        src/datastore/SteamGame.h
+        src/steam/ConnectionManager.cpp
+        src/steam/ConnectionManager.h
+        src/steam/JobID.h
+        src/steam/JobID.cpp
+        src/steam/SteamConnection.cpp
+        src/steam/SteamConnection.h
+        src/steam/SteamAuthConnection.cpp
+        src/steam/SteamAuthConnection.h
+        src/steam/Util.cpp
+        src/steam/Util.h
 ) 
 
 

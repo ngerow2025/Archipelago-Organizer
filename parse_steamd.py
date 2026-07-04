@@ -15,6 +15,8 @@ TYPE_MAP = {
     'short': 'int16_t',
     'sbyte': 'int8_t',
     'bool': 'bool',
+    'SteamKit2.GC.Internal.CMsgProtoBufHeader': 'steam::proto::CMsgProtoBufHeader',
+    'SteamKit2.Internal.CMsgProtoBufHeader': 'steam::proto::CMsgProtoBufHeader',
 }
 
 def rewrite_default_value(val_expr):
