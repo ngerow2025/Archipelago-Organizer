@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network WebSockets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network WebSockets Core5Compat)
 find_package(Protobuf CONFIG REQUIRED)
 
 # --- Preprocess Protobuf Files to add namespace 'steam' ---
@@ -245,6 +245,8 @@ set(PROJECT_SOURCES
         src/steam/SteamAuthConnection.h
         src/steam/Util.cpp
         src/steam/Util.h
+        src/frontend/ap_worlds/APWorldWidget.cpp
+        src/frontend/ap_worlds/APWorldWidget.h
 ) 
 
 
@@ -273,12 +275,15 @@ endif()
 
 add_subdirectory(3rd_party/ValveFileVDF)
 
+add_subdirectory(3rd_party/libzippp)
+
 # Disable uneeded options
 set(MAGIC_ENUM_OPT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(MAGIC_ENUM_OPT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(MAGIC_ENUM_OPT_INSTALL OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(3rd_party/magic_enum)
+add_subdirectory(3rd_party/pybind11)
 
 target_link_libraries(Archipelago-Organiser PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(Archipelago-Organiser PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
@@ -288,6 +293,8 @@ target_link_libraries(Archipelago-Organiser PRIVATE proto-objects)
 target_link_libraries(Archipelago-Organiser PRIVATE ValveFileVDF)
 target_link_libraries(Archipelago-Organiser PRIVATE magic_enum::magic_enum)
 target_link_libraries(Archipelago-Organiser PRIVATE Qt${QT_VERSION_MAJOR}::WebSockets)
+target_link_libraries(Archipelago-Organiser PRIVATE libzippp::libzippp)
+target_link_libraries(Archipelago-Organiser PRIVATE pybind11::embed)
 
 add_dependencies(Archipelago-Organiser generate-steam-enums)
 target_include_directories(Archipelago-Organiser PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/gen")

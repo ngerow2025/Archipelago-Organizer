@@ -11,3 +11,9 @@
 [submodule "external/magic_enum"]
 	path = 3rd_party/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
+[submodule "3rd_party/libzippp"]
+	path = 3rd_party/libzippp
+	url = https://github.com/ctabin/libzippp
+[submodule "3rd_party/pybind11"]
+	path = 3rd_party/pybind11
+	url = https://github.com/pybind/pybind11.git
