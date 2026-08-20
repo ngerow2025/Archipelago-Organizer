@@ -172,7 +172,7 @@ protobuf_generate(
 set(STEAM_LANGUAGE_DIR "${CMAKE_CURRENT_LIST_DIR}/3rd_party/SteamKit/Resources/SteamLanguage")
 set(STEAM_ENUMS_GEN_DIR "${CMAKE_CURRENT_LIST_DIR}/src/gen/enums")
 
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module Development.Embed) #Development components needed for pybind11
 
 set(GENERATED_ENUM_HEADERS
     "${STEAM_ENUMS_GEN_DIR}/emsg.h"

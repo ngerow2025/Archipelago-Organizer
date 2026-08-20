@@ -1,6 +1,10 @@
 //
 // Created by birb on 7/6/26.
 //
+#include <pybind11/pybind11.h>
+#include <pybind11/embed.h> // everything needed for embedding
+#include <pybind11/stl.h>
+//must be included first because it potentially interfears with standard marcros
 
 #include "APWorldWidget.h"
 
@@ -12,7 +16,6 @@
 
 #include "libzippp.h"
 
-#include <pybind11/embed.h> // everything needed for embedding
 namespace py = pybind11;
 
 using namespace libzippp;
@@ -174,6 +177,7 @@ void APWorldWidget::dragEnterEvent(QDragEnterEvent* event) {
 void APWorldWidget::installAPWorldFromDisk(const QString& filePath) {
     qDebug() << "installing .apworld file from disk: " << filePath;
     ZipArchive apWorldArchive(filePath.toStdString());
+    apWorldArchive.open();
     installApWorld(&apWorldArchive, filePath);
 }
 void APWorldWidget::installAPWorldFromData(const void* data, uint64_t size, const QString& name) {
@@ -184,9 +188,60 @@ void APWorldWidget::installAPWorldFromData(const void* data, uint64_t size, cons
     // Implement the logic to handle the .apworld data here
 }
 
+//this class must use std::string for strings because pybind11 can't reason about QStrings
+class ZipModuleImporter {
+public:
+    explicit ZipModuleImporter(const ZipArchive& archive, const std::string& name) : archive(archive), name(name) {
+        assert(archive.isOpen());
+    }
+
+    py::object find_spec(const std::string& fullname, const std::optional<std::string>& path, const std::optional<py::object>& target) {
+        qDebug() << "fullname: " << fullname << " path: " << path;
+        py::object ret_type = py::module_::import("importlib.machinery").attr("ModuleSpec");
+
+        //get the entry for the passed in path and fullname
+        std::string fileEntryName = path.value_or("") + "/" + name + ".py";
+        std::string dirEntryName = path.value_or("") + "/" + name + "/";
+        auto fileEntry = archive.getEntry(fileEntryName);
+        if (!fileEntry.isNull()) {
+            //this is a source file
+            ret_type.attr("name") = fullname;
+            ret_type.attr("parent") = path;
+        }
+
+        auto dirEntry = archive.getEntry(dirEntryName);
+        if (!dirEntry.isNull()) {
+            //this is a directory
+        }
+
+
+
+
+        ret_type.attr("origin") = archive.getPath();
+
+        return py::none();
+    }
+
+private:
+    const ZipArchive& archive;
+    const std::string& name;
+};
+
+PYBIND11_EMBEDDED_MODULE(zipmod, m, py::mod_gil_not_used()) {
+    py::class_<ZipModuleImporter>(m, "ZipModuleImporter")
+        .def("find_spec", &ZipModuleImporter::find_spec);
+}
+
 void getGameFromPython(const ZipArchive* archive, const QString& name) {
-    py::scoped_interpreter guard{};
-    py::module_::
+    PyConfig config;
+    PyConfig_InitIsolatedConfig(&config);
+    py::scoped_interpreter guard{&config};
+    py::module_::import("zipmod");
+
+    ZipModuleImporter importer(*archive, name.toStdString());
+    py::module_::import("sys").attr("meta_path").attr("insert")(0, importer);
+
+    py::module_::import(std::format("worlds.{}", name.toStdString()).c_str());
 }
 
 void APWorldWidget::installApWorld(const ZipArchive* archive, const QString& name) {
