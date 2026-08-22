@@ -1,0 +1,41 @@
+# install bazel and build protobuf from source
+FROM ubuntu@sha256:889d056d5c6c0bfb55789ff3710681d68e50713cb562d2196dc07110599c7a6f AS protobuf-builder
+
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    && apt-get update \
+    && apt-get -y --no-install-recommends install \
+        clang ninja-build git cmake ca-certificates
+
+RUN git clone https://github.com/protocolbuffers/protobuf --depth 1 --branch v36.0 --recurse-submodules --shallow-submodules
+
+ENV CC=clang
+ENV CXX=clang++
+
+RUN cd protobuf && cmake -S . -B build -G Ninja \
+  -Dprotobuf_BUILD_TESTS=OFF \
+  -DCMAKE_INSTALL_PREFIX=../install \
+  -DCMAKE_BUILD_TYPE=Release
+
+RUN cd protobuf && cmake --build build --parallel 24
+
+ENV CMAKE_INSTALL_PREFIX=/install
+
+RUN cd protobuf && cmake --build build --target install
+
+FROM ubuntu@sha256:889d056d5c6c0bfb55789ff3710681d68e50713cb562d2196dc07110599c7a6f AS base-builder
+# Ubuntu 26.04 LTS
+
+COPY --from=protobuf-builder /install /usr/local
+
+# ...
+
+
+# RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+
+# RUN apt-get update && apt-get install -y g++ git bazel && rm -rf /var/lib/apt/lists/*
+
+
+# RUN 
