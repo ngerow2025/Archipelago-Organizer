@@ -29,13 +29,14 @@ FROM ubuntu@sha256:889d056d5c6c0bfb55789ff3710681d68e50713cb562d2196dc07110599c7
 
 COPY --from=protobuf-builder /install /usr/local
 
-# ...
+
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+  --mount=target=/var/cache/apt,type=cache,sharing=locked \
+  rm -f /etc/apt/apt.conf.d/docker-clean \
+  && apt-get update \
+  && apt-get -y --no-install-recommends install \
+  clang ninja-build git cmake ca-certificates qt6-base-dev qt6-websockets-dev python3 python3-dev libzip-dev libbz2-dev libssl-dev liblzma-dev libcap-dev
 
 
-# RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
-
-# RUN apt-get update && apt-get install -y g++ git bazel && rm -rf /var/lib/apt/lists/*
-
-
-# RUN 
+ENV CC=clang
+ENV CXX=clang++
