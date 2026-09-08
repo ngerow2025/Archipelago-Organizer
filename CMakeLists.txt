@@ -143,12 +143,12 @@ foreach(PROTO_FILE ${ORIGINAL_PROTO_SOURCES})
     # Set up custom command to preprocess each proto file
     add_custom_command(
         OUTPUT "${PROCESSED_FILE}"
-        COMMAND Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/preprocess_protos.py"
+        COMMAND Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/scripts/preprocess_protos.py"
                 "${CMAKE_CURRENT_LIST_DIR}/${PROTO_FILE}"
                 "${PROCESSED_FILE}"
                 "${PROTO_PACKAGE}"
         DEPENDS "${CMAKE_CURRENT_LIST_DIR}/${PROTO_FILE}"
-                "${CMAKE_CURRENT_LIST_DIR}/preprocess_protos.py"
+                "${CMAKE_CURRENT_LIST_DIR}/scripts/preprocess_protos.py"
         COMMENT "Preprocessing proto: ${PROTO_FILE} -> ${PROCESSED_FILE}"
         VERBATIM
     )
@@ -186,11 +186,11 @@ set(GENERATED_ENUM_HEADERS
 
 add_custom_command(
     OUTPUT ${GENERATED_ENUM_HEADERS}
-    COMMAND Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/parse_steamd.py"
+    COMMAND Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/scripts/parse_steamd.py"
             -i "${STEAM_LANGUAGE_DIR}"
             -o "${STEAM_ENUMS_GEN_DIR}"
             -n "steam::lang"
-    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/parse_steamd.py"
+    DEPENDS "${CMAKE_CURRENT_LIST_DIR}/scripts/parse_steamd.py"
             "${STEAM_LANGUAGE_DIR}/emsg.steamd"
             "${STEAM_LANGUAGE_DIR}/enums.steamd"
             "${STEAM_LANGUAGE_DIR}/eresult.steamd"

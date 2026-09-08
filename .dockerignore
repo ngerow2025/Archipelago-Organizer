@@ -1,0 +1,17 @@
+archipelago_organiser.db
+.clang-format
+.gitignore
+src/gen/
+build/
+.vscode/
+.qtcreator/
+.junie/
+.idea/
+.github/
+.git/
+cmake-build-debug/
+cmake-build-release/
+Dockerfile.base
+Dockerfile.release
+README.md
+docker-compose.yaml

@@ -1,0 +1,43 @@
+services:
+    base:
+        build:
+            context: ./docker/base
+            dockerfile: ../../Dockerfile.base
+            target: base-builder # last stage in Dockerfile.base; safe to pin explicitly
+        image: archipelago-organizer-base:latest
+        working_dir: /workspace
+    runtime:
+        build:
+            context: .
+            dockerfile: Dockerfile.release
+        image: archipelago-organizer-runtime:latest
+        user: "${UID:-1000}:${GID:-1000}"
+        environment:
+            - HOME=/tmp
+            - XDG_CONFIG_HOME=/tmp/.config
+            - DISPLAY=${DISPLAY:-:0}
+            - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+            - XDG_RUNTIME_DIR=/tmp/runtime-root
+            - QT_QPA_PLATFORM=${QT_QPA_PLATFORM:-wayland}
+            - DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/runtime-root/bus
+        command:
+            - bash
+            - -c
+            - |
+                mkdir -p /tmp/.config
+                if [ -f /mnt/host-config/kdeglobals ]; then
+                    echo "[theme] KDE Plasma host detected"
+                    export QT_QPA_PLATFORMTHEME="${QT_QPA_PLATFORMTHEME:-kde}"
+                    cp /mnt/host-config/kdeglobals /tmp/.config/
+                    cp -r /mnt/host-config/kdedefaults /tmp/.config/ 2>/dev/null || true
+                else
+                    echo "[theme] non-KDE host detected, using xdg-desktop-portal"
+                    export QT_QPA_PLATFORMTHEME="${QT_QPA_PLATFORMTHEME:-gnome}"
+                fi
+                exec /workspace/build/Archipelago-Organiser
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${XDG_RUNTIME_DIR:-/run/user/1000}:/tmp/runtime-root
+            - ${HOME:-/home/birb}/.config:/mnt/host-config:ro
+        depends_on:
+            - base

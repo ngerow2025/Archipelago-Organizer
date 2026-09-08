@@ -1,0 +1,33 @@
+FROM archipelago-organizer-base:latest
+
+WORKDIR /workspace
+
+# install locales, and wayland packages
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+  --mount=target=/var/cache/apt,type=cache,sharing=locked \
+  rm -f /etc/apt/apt.conf.d/docker-clean \
+  && apt-get update \
+  && apt-get -y --no-install-recommends install \
+  locales \
+  qt6-wayland \
+  qt6-gtk-platformtheme \
+  plasma-integration \
+  kde-style-breeze \
+  breeze-icon-theme
+
+# set locale to en_US.UTF-8
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+
+
+
+COPY . .
+
+RUN cmake -B build -G Ninja
+RUN cmake --build build
+
+ENV QT_QPA_PLATFORM=wayland
+CMD ["/workspace/build/Archipelago-Organiser"]
