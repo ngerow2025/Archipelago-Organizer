@@ -324,6 +324,14 @@ install(TARGETS Archipelago-Organiser
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink 
+        "${CMAKE_CURRENT_SOURCE_DIR}/3rd_party/Archipelago" 
+        "${CMAKE_CURRENT_BINARY_DIR}/Archipelago"
+    COMMENT "Creating symbolic link to assets directory..."
+)
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Archipelago-Organiser)
 endif()
