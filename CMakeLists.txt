@@ -219,6 +219,8 @@ set(PROJECT_SOURCES
         src/frontend/games/RegisteredGamesWidget.h
         src/frontend/games/YAMLConfigsWidget.cpp
         src/frontend/games/YAMLConfigsWidget.h
+        src/logic/APWorldGithubRemote.cpp
+        src/logic/APWorldGithubRemote.h
         src/logic/Sandbox.cpp
         src/logic/Sandbox.h
         src/logic/Proton.cpp

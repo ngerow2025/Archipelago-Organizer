@@ -8,9 +8,11 @@
 #include "protobuf/steammessages_clientserver_login.pb.h"
 #include "steam/ConnectionManager.h"
 #include "steam/SteamAuthConnection.h"
+#include "logic/APWorldGithubRemote.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     createUI();
+    new APWorldGithubRemote(this, "agilbert1412", "StardewArchipelago");
     // new Database(this);
     {
         // auto nm = new ConnectionManager(this);
