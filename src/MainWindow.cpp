@@ -12,7 +12,6 @@
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     createUI();
-    new APWorldGithubRemote(this, "agilbert1412", "StardewArchipelago");
     // new Database(this);
     {
         // auto nm = new ConnectionManager(this);

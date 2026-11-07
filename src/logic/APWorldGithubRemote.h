@@ -27,6 +27,7 @@ class APWorldGithubRemote : public QWidget {
 
    public:
     explicit APWorldGithubRemote(QWidget* parent, QString githubUser, QString githubRepo);
+    void getRepoInfo();
 
    signals:
     void repoInfoReceived(const APWorldGithubRemoteInfo& info);
@@ -36,7 +37,6 @@ class APWorldGithubRemote : public QWidget {
     void allReleases(const std::vector<ReleaseInfo>& releases);
 
    private:
-    void getRepoInfo();
     void getReleases();
     void fetchPage(const QString& pageUrl);
     void registerRelease(const ReleaseInfo& info);

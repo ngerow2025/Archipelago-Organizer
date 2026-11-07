@@ -253,6 +253,9 @@ set(PROJECT_SOURCES
         src/steam/SteamAuthConnection.h
         src/steam/Util.cpp
         src/steam/Util.h
+        src/frontend/ap_worlds/APWorldSourceCard.cpp
+        src/frontend/ap_worlds/APWorldSourceCard.h
+        src/frontend/LoadingSpinner.h
 ) 
 
 

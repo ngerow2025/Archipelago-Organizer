@@ -19,7 +19,6 @@ APWorldGithubRemote::APWorldGithubRemote(QWidget* parent, QString githubUser, QS
         qDebug() << "# of total releases:" << releases.size();
     });
     m_manager = new QNetworkAccessManager(this);
-    this->getRepoInfo();
 };
 
 void APWorldGithubRemote::getRepoInfo() {
