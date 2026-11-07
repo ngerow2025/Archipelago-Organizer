@@ -215,6 +215,10 @@ set(PROJECT_SOURCES
         src/Main.cpp
         src/MainWindow.cpp
         src/MainWindow.h
+        src/frontend/ap_worlds/APWorldWidget.cpp
+        src/frontend/ap_worlds/APWorldWidget.h
+        src/frontend/ap_worlds/APWorldDragAndDrop.cpp
+        src/frontend/ap_worlds/APWorldDragAndDrop.h
         src/frontend/games/GameListWidget.cpp
         src/frontend/games/GameListWidget.h
         src/frontend/games/GameTabWidget.cpp
@@ -225,6 +229,8 @@ set(PROJECT_SOURCES
         src/frontend/games/RegisteredGamesWidget.h
         src/frontend/games/YAMLConfigsWidget.cpp
         src/frontend/games/YAMLConfigsWidget.h
+        src/logic/APWorldGithubRemote.cpp
+        src/logic/APWorldGithubRemote.h
         src/logic/Sandbox.cpp
         src/logic/Sandbox.h
         src/logic/Proton.cpp
@@ -233,6 +239,8 @@ set(PROJECT_SOURCES
         src/logic/Util.h
         src/logic/Mounts.cpp
         src/logic/Mounts.h
+        src/logic/LoadAPWorld.cpp
+        src/logic/LoadAPWorld.h
         src/games/ADOFAI/Config.cpp
         src/games/ADOFAI/Config.h
         src/datastore/Database.cpp
@@ -251,8 +259,9 @@ set(PROJECT_SOURCES
         src/steam/SteamAuthConnection.h
         src/steam/Util.cpp
         src/steam/Util.h
-        src/frontend/ap_worlds/APWorldWidget.cpp
-        src/frontend/ap_worlds/APWorldWidget.h
+        src/frontend/ap_worlds/APWorldSourceCard.cpp
+        src/frontend/ap_worlds/APWorldSourceCard.h
+        src/frontend/LoadingSpinner.h
 ) 
 
 

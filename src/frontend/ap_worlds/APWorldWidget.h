@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QWidget>
 
+#include "../../logic/APWorldGithubRemote.h"
 #include "libzippp.h"
 
 class APWorldWidget : public QWidget {
@@ -21,4 +22,6 @@ class APWorldWidget : public QWidget {
     void installAPWorldFromDisk(const QString& filePath);
     void installAPWorldFromData(const void* data, uint64_t size, const QString& name);
     void installApWorld(const libzippp::ZipArchive* archive, const QString& name);
+
+    std::vector<APWorldGithubRemote*> APWorldGithubRemotes;
 };
