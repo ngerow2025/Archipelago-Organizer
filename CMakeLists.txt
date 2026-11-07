@@ -157,12 +157,18 @@ endforeach()
 # Add the library target using the generated preprocessed proto files
 add_library(proto-objects OBJECT ${PROCESSED_PROTO_SOURCES})
 
-set(PROTO_BINARY_DIR "${CMAKE_CURRENT_LIST_DIR}/src/gen/protobuf") 
+set(PROTO_BINARY_DIR "${CMAKE_CURRENT_LIST_DIR}/src/gen/protobuf")
+file(MAKE_DIRECTORY "${PROTO_BINARY_DIR}")
 
 target_include_directories(proto-objects PUBLIC "$<BUILD_INTERFACE:${PROTO_BINARY_DIR}>")
 target_link_libraries(proto-objects PUBLIC protobuf::libprotobuf)
 
 # Run protobuf generation on the preprocessed files
+# Ensure full preprocessing completes before running any protoc invocation, since
+# the protos import each other by bare filename.
+add_custom_target(preprocess-protos DEPENDS ${PROCESSED_PROTO_SOURCES})
+add_dependencies(proto-objects preprocess-protos)
+
 protobuf_generate(
     TARGET proto-objects
     IMPORT_DIRS ${PROTO_IMPORT_DIRS}
