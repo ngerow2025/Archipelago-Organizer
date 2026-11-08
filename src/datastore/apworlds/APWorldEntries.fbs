@@ -1,0 +1,31 @@
+namespace serialization;
+
+enum LocalSourceType: byte {
+    APWorldFile,
+    Directory,
+    NotLocal,
+}
+
+enum RemoteSourceType: byte {
+    GithubRelease,
+    ArchipelagoMWGithub,
+    NotRemote,
+}
+
+
+table APWorldEntry {
+    major_version: int;
+    minor_version: int;
+    patch_version: int;
+    game: string;
+    remote_url: string;
+    local_path: string;
+    local_source_type: LocalSourceType;
+    remote_source_type: RemoteSourceType;
+}
+
+table APWorldEntries { 
+    entries: [APWorldEntry];
+}
+
+root_type APWorldEntries;

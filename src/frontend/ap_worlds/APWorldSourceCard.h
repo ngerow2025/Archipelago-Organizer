@@ -13,6 +13,8 @@ class APWorldSourceCard : public QWidget {
 
 public:
     explicit APWorldSourceCard(QWidget *parent = nullptr, APWorldGithubRemote* remote = nullptr);
+private:
+    APWorldGithubRemote* m_remote;
 };
 
 #endif  // ARCHIPELAGO_ORGANISER_APWORLDSOURCECARD_H

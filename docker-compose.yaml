@@ -3,7 +3,7 @@ services:
         build:
             context: ./docker/base
             dockerfile: ../../Dockerfile.base
-            target: base-builder # last stage in Dockerfile.base; safe to pin explicitly
+            target: base-builder
         image: archipelago-organizer-base:latest
         working_dir: /workspace
     runtime:

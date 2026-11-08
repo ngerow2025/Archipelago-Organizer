@@ -13,6 +13,7 @@ class APWorldWidget : public QWidget {
 
    public:
     explicit APWorldWidget(QWidget* parent = nullptr);
+    
 
    protected:
     void dropEvent(QDropEvent* event) override;

@@ -3,6 +3,8 @@
 #include <QWidget>
 #include <QNetworkAccessManager>
 
+#include <map>
+
 struct APWorldGithubRemoteInfo {
     QString name;
     QString description;
@@ -28,6 +30,9 @@ class APWorldGithubRemote : public QWidget {
    public:
     explicit APWorldGithubRemote(QWidget* parent, QString githubUser, QString githubRepo);
     void getRepoInfo();
+    std::optional<std::map<int, std::map<int, std::map<int, QList<ReleaseInfo>>>>> getSortedReleases() const {
+        return sortedReleases;
+    }
 
    signals:
     void repoInfoReceived(const APWorldGithubRemoteInfo& info);
@@ -49,5 +54,6 @@ class APWorldGithubRemote : public QWidget {
     int expectedResponses = -1;
     bool sentAllPageRequests = false;
     std::vector<ReleaseInfo> m_releases;
+    std::optional<std::map<int, std::map<int, std::map<int, QList<ReleaseInfo>>>>> sortedReleases;
     QNetworkAccessManager* m_manager;
 };

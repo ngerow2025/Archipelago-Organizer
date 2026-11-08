@@ -12,6 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network WebSockets)
 find_package(Protobuf CONFIG REQUIRED)
+find_package(FlatBuffers REQUIRED)
+
+# include(CMake/BuildFlatBuffers)
 
 # --- Preprocess Protobuf Files to add namespace 'steam' ---
 set(PROTO_PACKAGE "steam.proto")
@@ -211,6 +214,19 @@ add_custom_command(
 add_custom_target(generate-steam-enums DEPENDS ${GENERATED_ENUM_HEADERS})
 
 
+# compile the flatbuffers schema into C++ code
+set(SCHEMA_FILES 
+    src/datastore/apworlds/APWorldEntries.fbs
+)
+
+flatbuffers_generate_headers(
+    TARGET flatbuffers-objects
+    SCHEMAS ${SCHEMA_FILES}
+    # Optional flags to pass to flatc (e.g., --gen-mutable, --scoped-enums)
+    FLAGS "--scoped-enums" 
+)
+
+
 set(PROJECT_SOURCES
         src/Main.cpp
         src/MainWindow.cpp
@@ -262,6 +278,10 @@ set(PROJECT_SOURCES
         src/frontend/ap_worlds/APWorldSourceCard.cpp
         src/frontend/ap_worlds/APWorldSourceCard.h
         src/frontend/LoadingSpinner.h
+        src/datastore/apworlds/APWorldEntry.cpp
+        src/datastore/apworlds/APWorldEntry.h
+        src/datastore/apworlds/APWorldManager.cpp
+        src/datastore/apworlds/APWorldManager.h
 ) 
 
 
@@ -310,6 +330,8 @@ target_link_libraries(Archipelago-Organiser PRIVATE magic_enum::magic_enum)
 target_link_libraries(Archipelago-Organiser PRIVATE Qt${QT_VERSION_MAJOR}::WebSockets)
 target_link_libraries(Archipelago-Organiser PRIVATE libzippp::libzippp)
 target_link_libraries(Archipelago-Organiser PRIVATE pybind11::embed)
+target_link_libraries(Archipelago-Organiser PRIVATE flatbuffers-objects)
+
 
 add_dependencies(Archipelago-Organiser generate-steam-enums)
 target_include_directories(Archipelago-Organiser PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/gen")

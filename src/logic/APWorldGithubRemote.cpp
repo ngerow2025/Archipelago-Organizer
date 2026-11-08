@@ -10,7 +10,7 @@
 #include <QUrlQuery>
 
 APWorldGithubRemote::APWorldGithubRemote(QWidget* parent, QString githubUser, QString githubRepo)
-    : QWidget(parent), m_githubUser(githubUser), m_githubRepo(githubRepo) {
+    : QWidget(parent), m_githubUser(githubUser), m_githubRepo(githubRepo), sortedReleases(std::nullopt) {
     connect(this, &APWorldGithubRemote::repoInfoReceived, this,
             [this](const APWorldGithubRemoteInfo& info) { this->getReleases(); });
 
@@ -18,6 +18,7 @@ APWorldGithubRemote::APWorldGithubRemote(QWidget* parent, QString githubUser, QS
         qDebug() << "All releases processed.";
         qDebug() << "# of total releases:" << releases.size();
     });
+    qDebug() << "APWorldGithubRemote initialized for user:" << githubUser << ", repo:" << githubRepo;
     m_manager = new QNetworkAccessManager(this);
 };
 
@@ -118,6 +119,7 @@ void APWorldGithubRemote::processResponse(const QByteArray& rawData) {
     // Process the releases data
     for (const QJsonValue& value : jsonDoc) {
         QJsonObject release = value.toObject();
+        qDebug() << "Processing release: " << release;
         // Process each release
         // qDebug() << "Release: " << release["name"].toString();
         // qDebug() << "Description: " << release["body"].toString();
@@ -139,8 +141,7 @@ void APWorldGithubRemote::processResponse(const QByteArray& rawData) {
 }
 
 void APWorldGithubRemote::finished() {
-    emit allReleasesProcessed();
-    emit allReleases(m_releases);
+    
     for (const ReleaseInfo& release : m_releases) {
         qDebug() << "Release: " << release.name << ", Published: " << release.publishedAt;
         for (const ReleaseAsset& asset : release.assets) {
@@ -148,31 +149,31 @@ void APWorldGithubRemote::finished() {
         }
     }
 
-    //sort into major, minor, and patch releases
-    QMap<int, QMap<int, QMap<int, QList<ReleaseInfo>>>> sortedReleases;
+    sortedReleases = std::map<int, std::map<int, std::map<int, QList<ReleaseInfo>>>>();
 
-    for (const ReleaseInfo& release : m_releases) {
+    //sort into major, minor, and patch releases
+    for (const auto release : m_releases) {
         QStringList versionParts = release.tag.split('.');
         if (versionParts.size() >= 3) {
             int major = versionParts[0].toInt();
             int minor = versionParts[1].toInt();
             int patch = versionParts[2].toInt();
             
-            sortedReleases[major][minor][patch].push_back(release);
+            sortedReleases.value()[major][minor][patch].push_back(release);
         }
     }
 
     // Print sorted releases for debugging
-    for (auto majorIt = sortedReleases.begin(); majorIt != sortedReleases.end(); ++majorIt) {
-        int major = majorIt.key();
-        for (auto minorIt = majorIt.value().begin(); minorIt != majorIt.value().end(); ++minorIt) {
-            int minor = minorIt.key();
-            for (auto patchIt = minorIt.value().begin(); patchIt != minorIt.value().end(); ++patchIt) {
-                int patch = patchIt.key();
-                for (const ReleaseInfo& release : patchIt.value()) {
-                    qDebug() << "Release: " << major << "." << minor << "." << patch << " - " << release.name << ", Published: " << release.publishedAt;
+    for (const auto& [major_version, minor_versions] : sortedReleases.value()) {
+        for (const auto& [minor_version, patch_versions] : minor_versions) {
+            for (const auto& [patch_version, releases] : patch_versions) {
+                for (const ReleaseInfo& release : releases) {
+                    qDebug() << "Release: " << major_version << "." << minor_version << "." << patch_version << " - " << release.name << ", Published: " << release.publishedAt;
                 }
             }
         }
     }
+
+    emit allReleasesProcessed();
+    emit allReleases(m_releases);
 }
