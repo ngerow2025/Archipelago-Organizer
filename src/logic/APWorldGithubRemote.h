@@ -14,6 +14,7 @@ struct APWorldGithubRemoteInfo {
 struct ReleaseAsset {
     QString url;
     QString name;
+    QString digest;
 };
 
 struct ReleaseInfo {

@@ -282,6 +282,8 @@ set(PROJECT_SOURCES
         src/datastore/apworlds/APWorldEntry.h
         src/datastore/apworlds/APWorldManager.cpp
         src/datastore/apworlds/APWorldManager.h
+        src/datastore/apworlds/GithubSource.cpp
+        src/datastore/apworlds/GithubSource.h
 ) 
 
 

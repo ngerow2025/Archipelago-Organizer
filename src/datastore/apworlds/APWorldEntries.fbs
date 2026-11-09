@@ -24,8 +24,15 @@ table APWorldEntry {
     remote_source_type: RemoteSourceType;
 }
 
-table APWorldEntries { 
-    entries: [APWorldEntry];
+table GithubSource {
+    owner: string;
+    repo: string;
+    game_name: string;
 }
 
-root_type APWorldEntries;
+table APWorldMetadata { 
+    entries: [APWorldEntry];
+    github_sources: [GithubSource];
+}
+
+root_type APWorldMetadata;
